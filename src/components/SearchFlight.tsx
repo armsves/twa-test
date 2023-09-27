@@ -27,7 +27,7 @@ export function SearchFlight() {
   };
 
   const value = 0;
-  
+
   const handleSliderChange = () => {
     setSliderValue(value);
   };
@@ -46,22 +46,22 @@ export function SearchFlight() {
       //loadingAnimation.style.display = 'block';
       let bestFlight = [];
       let bestFlight2 = [];
-  
+
       for (let i = 0; i < 10; i++) {
         try {
           bestFlight = await buscarVuelo(cityDeparture, city1, city2, cityDays, departureDate, adults);
           bestFlight2 = await buscarVuelo(cityDeparture, city2, city1, cityDays, departureDate, adults);
-          break; 
+          break;
         } catch (error) {
-          console.error(`Error fetching flight data. Retrying... (${i+1}/10)`);
-          await delay(1500); 
+          console.error(`Error fetching flight data. Retrying... (${i + 1}/10)`);
+          await delay(1500);
         }
       }
-  
+
       if (bestFlight[0] > bestFlight2[0]) {
         bestFlight = bestFlight2;
       }
-  
+
       //const link = document.getElementById("link");
       //const precio = document.getElementById("precio");
       //const agents = document.getElementById("agents");
@@ -75,17 +75,17 @@ export function SearchFlight() {
       console.error(error);
     }
   }
-  
+
   async function buscarVuelo(cityDeparture: string, city1: string, city2: string, cityDays: string, departureDate: string, adults: string) {
     let flightData = [];
     const url = "https://corsproxy.armsves.workers.dev/corsproxy/";
-  
+
     console.log(departureDate)
     const departure = departureDate.split("-");
     let date = new Date(parseInt(departure[0]), parseInt(departure[1]), parseInt(departure[2]));
     console.log(departure[0])
     console.log(date)
-  
+
     //cityDays = parseInt(cityDays);
     const day = date.getDate();
     const month = date.getMonth() + 1;
@@ -102,7 +102,7 @@ export function SearchFlight() {
     const year3 = date.getFullYear();
     console.log(day3)
 
-  
+
     const headers = {};
     const data = {
       "query": {
@@ -132,18 +132,18 @@ export function SearchFlight() {
       }
     };
     console.log(data)
-  
+
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(data)
       });
-  
+
       if (response.ok) {
         const vuelosFinal = await response.json();
 
-        
+
         const jsonObject = vuelosFinal['content']['results']['itineraries'];
         const jsonArray: any = Object.values(jsonObject);
         //const jsonArray = jsonObject.values;
@@ -154,9 +154,9 @@ export function SearchFlight() {
           const amountB = parseInt(b["pricingOptions"][0]["price"]["amount"]);
           if (amountA < amountB) { return -1; } else if (amountA > amountB) { return 1; } else { return 0; }
         });
-        const flightData = [jsonArray[0]["pricingOptions"][0]["price"]["amount"]/1000, jsonArray[0]["pricingOptions"][0]["agentIds"][0], jsonArray[0]["pricingOptions"][0]["items"][0]["deepLink"]];
-        
-        if (flightData != null) { jsonArray[0]["pricingOptions"][0]["price"]["amount"]/1000; }
+        const flightData = [jsonArray[0]["pricingOptions"][0]["price"]["amount"] / 1000, jsonArray[0]["pricingOptions"][0]["agentIds"][0], jsonArray[0]["pricingOptions"][0]["items"][0]["deepLink"]];
+
+        if (flightData != null) { jsonArray[0]["pricingOptions"][0]["price"]["amount"] / 1000; }
         setResponses(flightData[0]);
         setResponsesLink(flightData[2]);
         console.log(flightData[0]);
@@ -193,52 +193,58 @@ export function SearchFlight() {
   //**********
 
   //
-//<Input style={{ marginRight: 8 }} type="number" value={tonAmount} onChange={(e) => setTonAmount(e.target.value)}></Input>
-//<Input type="number" value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} >
-//<Slider aria-label="Columns" value={sliderValue} onChange={handleSliderChange} min={1} max={6} step={1} />
-//<Input type="number" min="1" value={cityDays} onChange={(e) => setcityDays(e.target.value)} ></Input>
-//<Input value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} ></Input>
-//  <Slider aria-label="Columns" value={sliderValue} onChange={handleSliderChange} min={1} max={6} step={1} />
+  //<Input style={{ marginRight: 8 }} type="number" value={tonAmount} onChange={(e) => setTonAmount(e.target.value)}></Input>
+  //<Input type="number" value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} >
+  //<Slider aria-label="Columns" value={sliderValue} onChange={handleSliderChange} min={1} max={6} step={1} />
+  //<Input type="number" min="1" value={cityDays} onChange={(e) => setcityDays(e.target.value)} ></Input>
+  //<Input value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} ></Input>
+  //  <Slider aria-label="Columns" value={sliderValue} onChange={handleSliderChange} min={1} max={6} step={1} />
   return (
     <Card>
       <FlexBoxCol>
         <h3>Search Flight</h3>
         <FlexBoxRow>
           <label>Departure City: </label>
-          <Input style={{ width: '150px'}} value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} ></Input>
+          <Input style={{ width: '150px' }} value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} ></Input>
+        </FlexBoxRow>
 
+        <FlexBoxRow>
           <label>City 1: </label>
-          <Input style={{ width: '150px'}} value={city1} onChange={(e) => setCity1(e.target.value)} ></Input>
+          <Input style={{ width: '150px' }} value={city1} onChange={(e) => setCity1(e.target.value)} ></Input>
+        </FlexBoxRow>
 
+        <FlexBoxRow>
           <label>City 2: </label>
-          <Input style={{ width: '150px'}} value={city2} onChange={(e) => setCity2(e.target.value)} ></Input>
+          <Input style={{ width: '150px' }} value={city2} onChange={(e) => setCity2(e.target.value)} ></Input>
         </FlexBoxRow>
 
         <FlexBoxRow>
           <label>Days in each city: </label>
-          <Input style={{ width: '50px'}} type="number" min="1" value={cityDays} onChange={(e) => setcityDays(e.target.value)} ></Input>
+          <Input style={{ width: '50px' }} type="number" min="1" value={cityDays} onChange={(e) => setcityDays(e.target.value)} ></Input>
 
           <label>How many adults: </label>
-          <Input style={{ width: '50px'}} type="number" min="1" value={adults} onChange={(e) => setAdults(e.target.value)} ></Input>
+          <Input style={{ width: '50px' }} type="number" min="1" value={adults} onChange={(e) => setAdults(e.target.value)} ></Input>
+          </FlexBoxRow>
 
+        <FlexBoxRow>
           <label>Date of departure: </label>
-          <Input style={{ width: '100px'}} type="date" value={departureDate} min={getCurrentDate()} onChange={(e) => setDepartureDate(e.target.value)} ></Input>
-          
+          <Input style={{ width: '100px' }} type="date" value={departureDate} min={getCurrentDate()} onChange={(e) => setDepartureDate(e.target.value)} ></Input>
+
         </FlexBoxRow>
 
-        <Button style={{ marginTop: 18 }} 
+        <Button style={{ marginTop: 18 }}
           onClick={async () => { buscarVuelo(cityDeparture, city1, city2, cityDays, departureDate, adults); }}
         >Search</Button>
       </FlexBoxCol>
       <FlexBoxCol>
-      {responses ? (
-        <div>
-          <h3>The Best price is: €{JSON.stringify(responses, null, 2)}</h3>
-          <p><a href={responsesLink ? (responsesLink) : ( "" )} target="_blank">Buy Tickets</a></p>
-        </div>
-      ) : (
-       <></>
-      )}
+        {responses ? (
+          <div>
+            <h3>The Best price is: €{JSON.stringify(responses, null, 2)}</h3>
+            <p><a href={responsesLink ? (responsesLink) : ("")} target="_blank">Buy Tickets</a></p>
+          </div>
+        ) : (
+          <></>
+        )}
       </FlexBoxCol>
     </Card>
   );
