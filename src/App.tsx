@@ -26,7 +26,7 @@ const AppContainer = styled.div`
   max-width: 900px;
   margin: 0 auto;
 `;
-
+//<Counter />
 function App() {
   const { network } = useTonConnect();
 
@@ -45,7 +45,7 @@ function App() {
             </Button>
           </FlexBoxRow>
           <SearchFlight />
-          <Counter />
+          
         </FlexBoxCol>
       </AppContainer>
     </StyledApp>

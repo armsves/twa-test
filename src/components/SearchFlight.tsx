@@ -88,21 +88,21 @@ export function SearchFlight() {
   
     console.log(departureDate)
     const departure = departureDate.split("-");
-    let date = new Date(departure[0], departure[1], departure[2]);
+    let date = new Date(parseInt(departure[0]), parseInt(departure[1]), parseInt(departure[2]));
     console.log(departure[0])
     console.log(date)
   
-    cityDays = parseInt(cityDays)
+    //cityDays = parseInt(cityDays);
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     console.log(date)
-    date.setDate(day + cityDays)
+    date.setDate(parseInt(day + cityDays));
     const day2 = date.getDate();
     const month2 = date.getMonth() + 1;
     const year2 = date.getFullYear();
     console.log(date)
-    date.setDate(day2 + cityDays)
+    date.setDate(parseInt(day2 + cityDays));
     const day3 = date.getDate();
     const month3 = date.getMonth() + 1;
     const year3 = date.getFullYear();
@@ -151,16 +151,18 @@ export function SearchFlight() {
 
         
         const jsonObject = vuelosFinal['content']['results']['itineraries'];
-        const jsonArray = Object.values(jsonObject);
-  
-        jsonArray.sort((a, b) => {
+        const jsonArray: any = Object.values(jsonObject);
+        //const jsonArray = jsonObject.values;
+
+        jsonArray.sort((a: any, b: any) => {
           console.log(a["pricingOptions"][0]["price"]["amount"] + " /n")
           const amountA = parseInt(a["pricingOptions"][0]["price"]["amount"]);
           const amountB = parseInt(b["pricingOptions"][0]["price"]["amount"]);
           if (amountA < amountB) { return -1; } else if (amountA > amountB) { return 1; } else { return 0; }
         });
-        flightData = [jsonArray[0]["pricingOptions"][0]["price"]["amount"]/1000, jsonArray[0]["pricingOptions"][0]["agentIds"][0], jsonArray[0]["pricingOptions"][0]["items"][0]["deepLink"]];
-        if (flightData != null) { setResponses(flightData[0]); }
+        const flightData = [jsonArray[0]["pricingOptions"][0]["price"]["amount"]/1000, jsonArray[0]["pricingOptions"][0]["agentIds"][0], jsonArray[0]["pricingOptions"][0]["items"][0]["deepLink"]];
+        
+        if (flightData != null) { jsonArray[0]["pricingOptions"][0]["price"]["amount"]/1000; }
         setResponsesLink(flightData[2]);
         return flightData;
       } else {
@@ -242,12 +244,10 @@ export function SearchFlight() {
         >Search</Button>
       </FlexBoxCol>
       <FlexBoxCol>
-      <h3>Results</h3>
       {responses ? (
         <div>
-          <h1>The Best price is: </h1>
-          <pre>{JSON.stringify(responses, null, 2)}</pre>
-          <a href={responsesLink} target="_blank">Buy Tickets</a>
+          <h3>The Best price is: €{JSON.stringify(responses, null, 2)}</h3>
+          <p><a href={responsesLink ? (responsesLink) : ( "" )} target="_blank">Buy Tickets</a></p>
         </div>
       ) : (
        <></>
