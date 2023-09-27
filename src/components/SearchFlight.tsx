@@ -5,13 +5,9 @@ import { useTonConnect } from "../hooks/useTonConnect";
 import { Card, FlexBoxCol, FlexBoxRow, Button, Input } from "./styled/styled";
 import { Slider } from '@mui/material';
 
-
-
-
 export function SearchFlight() {
   const { sender, connected } = useTonConnect();
 
-  const [tonAmount, setTonAmount] = useState("0.01");
   const [cityDeparture, setCityDeparture] = useState("");
   const [city1, setCity1] = useState("");
   const [city2, setCity2] = useState("");
@@ -21,8 +17,6 @@ export function SearchFlight() {
   const [sliderValue, setSliderValue] = useState(1);
 
   const [departureDate, setDepartureDate] = useState("");
-
-  const [tonRecipient, setTonRecipient] = useState("EQAA");
 
   const getCurrentDate = (): string => {
     const today = new Date();
@@ -60,7 +54,7 @@ export function SearchFlight() {
           break; 
         } catch (error) {
           console.error(`Error fetching flight data. Retrying... (${i+1}/10)`);
-          await delay(1000); 
+          await delay(1500); 
         }
       }
   
@@ -68,8 +62,8 @@ export function SearchFlight() {
         bestFlight = bestFlight2;
       }
   
-      const link = document.getElementById("link");
-      const precio = document.getElementById("precio");
+      //const link = document.getElementById("link");
+      //const precio = document.getElementById("precio");
       //const agents = document.getElementById("agents");
       //precio.innerHTML = bestFlight[0] / 1000;
       //agents.innerHTML = bestFlight[1];
@@ -163,7 +157,10 @@ export function SearchFlight() {
         const flightData = [jsonArray[0]["pricingOptions"][0]["price"]["amount"]/1000, jsonArray[0]["pricingOptions"][0]["agentIds"][0], jsonArray[0]["pricingOptions"][0]["items"][0]["deepLink"]];
         
         if (flightData != null) { jsonArray[0]["pricingOptions"][0]["price"]["amount"]/1000; }
+        setResponses(flightData[0]);
         setResponsesLink(flightData[2]);
+        console.log(flightData[0]);
+        console.log(flightData[2]);
         return flightData;
       } else {
         console.log('Request failed with status code:', response.status);
@@ -208,39 +205,29 @@ export function SearchFlight() {
         <h3>Search Flight</h3>
         <FlexBoxRow>
           <label>Departure City: </label>
-          <Input value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} ></Input>
-        </FlexBoxRow>
+          <Input style={{ width: '150px'}} value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} ></Input>
 
-        <FlexBoxRow>
           <label>City 1: </label>
-          <Input value={city1} onChange={(e) => setCity1(e.target.value)} ></Input>
-        </FlexBoxRow>
+          <Input style={{ width: '150px'}} value={city1} onChange={(e) => setCity1(e.target.value)} ></Input>
 
-        <FlexBoxRow>
           <label>City 2: </label>
-          <Input value={city2} onChange={(e) => setCity2(e.target.value)} ></Input>
+          <Input style={{ width: '150px'}} value={city2} onChange={(e) => setCity2(e.target.value)} ></Input>
         </FlexBoxRow>
 
         <FlexBoxRow>
           <label>Days in each city: </label>
-          <Input type="number" min="1" value={cityDays} onChange={(e) => setcityDays(e.target.value)} ></Input>
-        </FlexBoxRow>
+          <Input style={{ width: '50px'}} type="number" min="1" value={cityDays} onChange={(e) => setcityDays(e.target.value)} ></Input>
 
-        <FlexBoxRow>
           <label>How many adults: </label>
-          <Input type="number" min="1" value={adults} onChange={(e) => setAdults(e.target.value)} ></Input>
-        </FlexBoxRow>
+          <Input style={{ width: '50px'}} type="number" min="1" value={adults} onChange={(e) => setAdults(e.target.value)} ></Input>
 
-        <FlexBoxRow>
           <label>Date of departure: </label>
-          <Input type="date" value={departureDate} min={getCurrentDate()} onChange={(e) => setDepartureDate(e.target.value)} ></Input>
+          <Input style={{ width: '100px'}} type="date" value={departureDate} min={getCurrentDate()} onChange={(e) => setDepartureDate(e.target.value)} ></Input>
           
         </FlexBoxRow>
 
-        <Button style={{ marginTop: 18 }}
-          onClick={async () => {
-            buscarVuelo(cityDeparture, city1, city2, cityDays, departureDate, adults);
-          }}
+        <Button style={{ marginTop: 18 }} 
+          onClick={async () => { buscarVuelo(cityDeparture, city1, city2, cityDays, departureDate, adults); }}
         >Search</Button>
       </FlexBoxCol>
       <FlexBoxCol>
