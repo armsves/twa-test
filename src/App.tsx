@@ -1,6 +1,7 @@
 import "./App.css";
 import { TonConnectButton } from "@tonconnect/ui-react";
 import { Counter } from "./components/Counter";
+import { SearchFlight } from "./components/SearchFlight";
 import { Jetton } from "./components/Jetton";
 import { TransferTon } from "./components/TransferTon";
 import styled from "styled-components";
@@ -44,6 +45,7 @@ function App() {
             </Button>
           </FlexBoxRow>
           <Counter />
+          <SearchFlight />
         </FlexBoxCol>
       </AppContainer>
     </StyledApp>
