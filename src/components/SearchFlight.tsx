@@ -25,6 +25,14 @@ export function SearchFlight() {
 
   const [tonRecipient, setTonRecipient] = useState("EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c");
 
+  const getCurrentDate = (): string => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleSliderChange = (event, value) => {
     setSliderValue(value);
   };
@@ -64,7 +72,7 @@ export function SearchFlight() {
 
         <FlexBoxRow>
           <label>Date of departure: </label>
-          <Input type="date" value={departureDate} onChange={(e) => setDepartureDate(e.target.value)} ></Input>
+          <Input type="date" value={departureDate} min={getCurrentDate()} onChange={(e) => setDepartureDate(e.target.value)} ></Input>
           
         </FlexBoxRow>
 

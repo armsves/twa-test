@@ -44,8 +44,8 @@ function App() {
                 : "N/A"}
             </Button>
           </FlexBoxRow>
-          <Counter />
           <SearchFlight />
+          <Counter />
         </FlexBoxCol>
       </AppContainer>
     </StyledApp>
