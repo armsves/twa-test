@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Address, toNano } from "ton";
 import { useTonConnect } from "../hooks/useTonConnect";
@@ -33,21 +33,85 @@ export function SearchFlight() {
     return `${year}-${month}-${day}`;
   };
 
+
+  //
+  const [searchTerm, setSearchTerm] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedSuggestion, setSelectedSuggestion] = useState(null);
+
+  useEffect(() => {
+    if (searchTerm.length > 2) {
+      const url = 'https://corsautosuggest.armsves.workers.dev/corsproxy/';
+      const data = {
+        query: {
+          market: 'UK',
+          locale: 'en-GB',
+          searchTerm: searchTerm,
+          includedEntityTypes: [
+            'PLACE_TYPE_CITY',
+            'PLACE_TYPE_COUNTRY',
+            'PLACE_TYPE_AIRPORT',
+          ],
+        },
+        limit: 10,
+        isDestination: true,
+      };
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const places = data.places;
+          setSuggestions(places);
+        })
+        .catch((error) => console.error('Error:', error));
+    } else {
+      setSuggestions([]); // Clear suggestions when input length is less than 3
+    }
+  }, [searchTerm]);
+
+  const handleInputChange = (value) => {
+    setSearchTerm(value);
+  };
+
+  const handleSuggestionClick = (place) => {
+    setSelectedSuggestion(place);
+    setSearchTerm(`${place.cityName}, ${place.countryName} (${place.iataCode})`);
+  };
+  //
+  /*
   const handleSliderChange = (event, value) => {
     setSliderValue(value);
   };
-
+*/
 //<Input style={{ marginRight: 8 }} type="number" value={tonAmount} onChange={(e) => setTonAmount(e.target.value)}></Input>
 //<Input type="number" value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} >
 //<Slider aria-label="Columns" value={sliderValue} onChange={handleSliderChange} min={1} max={6} step={1} />
 //<Input type="number" min="1" value={cityDays} onChange={(e) => setCityDays(e.target.value)} ></Input>
+//<Input value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} ></Input>
   return (
     <Card>
       <FlexBoxCol>
         <h3>Search Flight</h3>
         <FlexBoxRow>
           <label>Departure City: </label>
-          <Input value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} ></Input>
+          <Input value={cityDeparture} onChange={(e) => handleInputChange(e.target.value)} ></Input>
+          <div id="suggestionBox">
+        {suggestions.map((place, index) => (
+          <p
+            key={index}
+            onClick={() => handleSuggestionClick(place)}
+            className={selectedSuggestion === place ? 'selected' : ''}
+          >
+            {`${place.cityName}, ${place.countryName} (${place.iataCode})`}
+          </p>
+        ))}
+      </div>
         </FlexBoxRow>
 
         <FlexBoxRow>
