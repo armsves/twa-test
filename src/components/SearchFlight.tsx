@@ -18,8 +18,8 @@ export function SearchFlight() {
   const [city1Val, setCity1Val] = useState("");
   const [city2, setCity2] = useState("");
   const [city2Val, setCity2Val] = useState("");
-  const [cityDays, setcityDays] = useState("1");
-  const [adults, setAdults] = useState("1");
+  const [cityDays, setcityDays] = useState(1);
+  const [adults, setAdults] = useState(1);
 
   const [sliderValue, setSliderValue] = useState(1);
 
@@ -348,6 +348,19 @@ export function SearchFlight() {
     setSuggestionClicked3(true);
   }
 
+  const handleCityDaysIncrement = () => { setcityDays(cityDays + 1) };
+  const handleCityDaysDecrement = () => {
+    if (cityDays > 0) { setcityDays(cityDays - 1) }
+  };
+
+  const handleAdultsIncrement = () => { setAdults(adults + 1) };
+  const handleAdultsDecrement = () => {
+    if (adults > 0) { setAdults(adults - 1) }
+  };
+
+  //<Input style={{ width: '50px' }} type="number" min="1" value={cityDays} onChange={(e) => setcityDays(e.target.value)} ></Input>
+  //<Input style={{ width: '50px' }} type="number" min="1" value={adults} onChange={(e) => setAdults(e.target.value)} ></Input>
+
   return (
     <Card>
       <FlexBoxCol>
@@ -399,10 +412,14 @@ export function SearchFlight() {
 
         <FlexBoxRow>
           <label>Days in each city: </label>
-          <Input style={{ width: '50px' }} type="number" min="1" value={cityDays} onChange={(e) => setcityDays(e.target.value)} ></Input>
 
+          <button onClick={handleCityDaysDecrement}>-</button>
+          <span>{cityDays}</span>
+          <button onClick={handleCityDaysIncrement}>+</button>
           <label>How many adults: </label>
-          <Input style={{ width: '50px' }} type="number" min="1" value={adults} onChange={(e) => setAdults(e.target.value)} ></Input>
+          <button onClick={handleAdultsDecrement}>-</button>
+          <span>{adults}</span>
+          <button onClick={handleAdultsIncrement}>+</button>
         </FlexBoxRow>
 
         <FlexBoxRow>
@@ -425,7 +442,7 @@ export function SearchFlight() {
           textShadow: '0 0 2px black',
           width: '120px'
         }}
-          onClick={async () => { buscarVuelo(cityDepartureVal, city1Val, city2Val, cityDays, departureDate, adults); }}
+          onClick={async () => { buscarVuelo(cityDepartureVal, city1Val, city2Val, String(cityDays), departureDate, String(adults)); }}
         >Search</Button>
       </FlexBoxCol>
       <FlexBoxCol>
