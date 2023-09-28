@@ -15,7 +15,9 @@ export function SearchFlight() {
   const [cityDeparture, setCityDeparture] = useState("");
   const [cityDepartureVal, setCityDepartureVal] = useState("");
   const [city1, setCity1] = useState("");
+  const [city1Val, setCity1Val] = useState("");
   const [city2, setCity2] = useState("");
+  const [city2Val, setCity2Val] = useState("");
   const [cityDays, setcityDays] = useState("1");
   const [adults, setAdults] = useState("1");
 
@@ -24,7 +26,11 @@ export function SearchFlight() {
   const [departureDate, setDepartureDate] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [suggestionsCity1, setSuggestionsCity1] = useState<Suggestion[]>([]);
+  const [suggestionsCity2, setSuggestionsCity2] = useState<Suggestion[]>([]);
   const [suggestionClicked, setSuggestionClicked] = useState(false);
+  const [suggestionClicked2, setSuggestionClicked2] = useState(false);
+  const [suggestionClicked3, setSuggestionClicked3] = useState(false);
+
   const [responses, setResponses] = useState(null);
   const [responsesLink, setResponsesLink] = useState(null);
 
@@ -224,6 +230,66 @@ export function SearchFlight() {
     }
   }
 
+  function fetchSuggestionsCity1(inputField: string) {
+    if (inputField.length > 2) {
+      const url = 'https://corsautosuggest.armsves.workers.dev/corsproxy/';
+      //const searchTerm = inputField.value;
+      const data = {
+        query: {
+          market: 'UK',
+          locale: 'en-GB',
+          searchTerm: inputField,
+          includedEntityTypes: ['PLACE_TYPE_CITY', 'PLACE_TYPE_COUNTRY', 'PLACE_TYPE_AIRPORT']
+        },
+        limit: 5,
+        isDestination: true
+      };
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then((data: { places: Suggestion[] }) => {
+          setSuggestionsCity1(data.places); // Set the suggestions in state
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  }
+
+  function fetchSuggestionsCity2(inputField: string) {
+    if (inputField.length > 2) {
+      const url = 'https://corsautosuggest.armsves.workers.dev/corsproxy/';
+      //const searchTerm = inputField.value;
+      const data = {
+        query: {
+          market: 'UK',
+          locale: 'en-GB',
+          searchTerm: inputField,
+          includedEntityTypes: ['PLACE_TYPE_CITY', 'PLACE_TYPE_COUNTRY', 'PLACE_TYPE_AIRPORT']
+        },
+        limit: 5,
+        isDestination: true
+      };
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then((data: { places: Suggestion[] }) => {
+          setSuggestionsCity2(data.places); // Set the suggestions in state
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  }
+
   function boldenMatch(text: string, highlighting: string) {
     let boldenedText = text;
 
@@ -241,27 +307,46 @@ export function SearchFlight() {
     } else {
       setSuggestions([]);
     }
-  }, [cityDeparture]);
+  }, [cityDeparture, city1]);
 
   useEffect(() => {
-    if (city1.length >= 2 && !suggestionClicked) {
-      fetchSuggestions(city1);
+    if (city1.length >= 2 && !suggestionClicked2) {
+      fetchSuggestionsCity1(city1);
     } else {
-      setSuggestions([]);
+      setSuggestionsCity1([]);
     }
   }, [city1]);
 
-  // Function to handle suggestion click
+  useEffect(() => {
+    if (city2.length >= 2 && !suggestionClicked3) {
+      fetchSuggestionsCity2(city2);
+    } else {
+      setSuggestionsCity2([]);
+    }
+  }, [city2]);
+
   function handleSuggestionClick(place: Suggestion) {
-    // Update the input field with name and country name
     const newValue = `${place.cityName}, ${place.countryName} (${place.iataCode})`;
     setCityDeparture(newValue);
     setCityDepartureVal(`${place.iataCode}`);
     setSuggestionClicked(true);
-
   }
 
-  //******* */
+  function handleSuggestionCity1Click(place: Suggestion) {
+    // Update the input field with name and country name
+    const newValue = `${place.cityName}, ${place.countryName} (${place.iataCode})`;
+    setCity1(newValue);
+    setCity1Val(`${place.iataCode}`);
+    setSuggestionClicked2(true);
+  }
+
+  function handleSuggestionCity2Click(place: Suggestion) {
+    // Update the input field with name and country name
+    const newValue = `${place.cityName}, ${place.countryName} (${place.iataCode})`;
+    setCity2(newValue);
+    setCity2Val(`${place.iataCode}`);
+    setSuggestionClicked3(true);
+  }
 
   return (
     <Card>
@@ -270,7 +355,10 @@ export function SearchFlight() {
         <FlexBoxRow>
           <label>Departure City: </label>
           <Input style={{ width: '150px' }} value={cityDeparture} onChange={(e) => { setCityDeparture(e.target.value); setSuggestionClicked(false); }} ></Input>
-          <div>
+
+        </FlexBoxRow>
+        <FlexBoxRow>
+          <div style={{ position: 'relative' }}>
             {suggestions.map((place: Suggestion, index) => (
               <p key={index} onClick={() => handleSuggestionClick(place)} style={{ cursor: 'pointer' }}>
                 {`${place.cityName}, ${place.countryName} (${place.iataCode})`}
@@ -281,10 +369,13 @@ export function SearchFlight() {
 
         <FlexBoxRow>
           <label>City 1: </label>
-          <Input style={{ width: '150px' }} value={city1} onChange={(e) => setCity1(e.target.value)} ></Input>
-          <div>
+          <Input style={{ width: '150px' }} value={city1} onChange={(e) => { setCity1(e.target.value); setSuggestionClicked2(false); }} ></Input>
+        </FlexBoxRow>
+
+        <FlexBoxRow>
+          <div style={{ position: 'relative' }}>
             {suggestionsCity1.map((place: Suggestion, index) => (
-              <p key={index} onClick={() => handleSuggestionClick(place)} style={{ cursor: 'pointer' }}>
+              <p key={index} onClick={() => handleSuggestionCity1Click(place)} style={{ cursor: 'pointer' }}>
                 {`${place.cityName}, ${place.countryName} (${place.iataCode})`}
               </p>
             ))}
@@ -293,7 +384,17 @@ export function SearchFlight() {
 
         <FlexBoxRow>
           <label>City 2: </label>
-          <Input style={{ width: '150px' }} value={city2} onChange={(e) => setCity2(e.target.value)} ></Input>
+          <Input style={{ width: '150px' }} value={city2} onChange={(e) => { setCity2(e.target.value); setSuggestionClicked3(false); }} ></Input>
+        </FlexBoxRow>
+
+        <FlexBoxRow>
+          <div style={{ position: 'relative' }}>
+            {suggestionsCity2.map((place: Suggestion, index) => (
+              <p key={index} onClick={() => handleSuggestionCity2Click(place)} style={{ cursor: 'pointer' }}>
+                {`${place.cityName}, ${place.countryName} (${place.iataCode})`}
+              </p>
+            ))}
+          </div>
         </FlexBoxRow>
 
         <FlexBoxRow>
@@ -322,8 +423,9 @@ export function SearchFlight() {
           cursor: 'pointer',
           textDecoration: 'none',
           textShadow: '0 0 2px black',
+          width: '120px'
         }}
-          onClick={async () => { buscarVuelo(cityDepartureVal, city1, city2, cityDays, departureDate, adults); }}
+          onClick={async () => { buscarVuelo(cityDepartureVal, city1Val, city2Val, cityDays, departureDate, adults); }}
         >Search</Button>
       </FlexBoxCol>
       <FlexBoxCol>
@@ -331,18 +433,18 @@ export function SearchFlight() {
           <div>
             <h3>The Best price is: €{JSON.stringify(responses, null, 2)}</h3>
             <p><a style={{
-                  background: 'linear-gradient(45deg, #572785, #ec1e79, #28abe2, #f15a24, #fbb03b)',
-                  color: 'white',
-                  padding: '10px 20px',
-                  border: 'none',
-                  borderRadius: '45px',
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  textDecoration: 'none',
-                  textShadow: '0 0 2px black',
+              background: 'linear-gradient(45deg, #572785, #ec1e79, #28abe2, #f15a24, #fbb03b)',
+              color: 'white',
+              padding: '10px 20px',
+              border: 'none',
+              borderRadius: '45px',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              textDecoration: 'none',
+              textShadow: '0 0 2px black',
             }}
-            href={responsesLink ? (responsesLink) : ("")} target="_blank">Buy Tickets</a></p>
+              href={responsesLink ? (responsesLink) : ("")} target="_blank">Buy Tickets</a></p>
           </div>
         ) : (
           <></>
