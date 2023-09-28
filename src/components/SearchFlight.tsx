@@ -101,15 +101,15 @@ export function SearchFlight() {
     const year3 = date.getFullYear();
     console.log(date + " date3")
 
-    //const url = "https://corsproxy.armsves.workers.dev/corsproxy/";
-    //const headers = {};
-    const url = "https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create/";
+    const url = "https://corsproxy2.armsves.workers.dev/corsproxy/";
+    const headers = {};
+    //const url = "https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create/";
     //const headers = { " x-api-key" : "sh428739766321522266746152871799" };
     //url = 'https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create'
-    const headers = {
+    /*const headers = {
         'x-api-key': 'prtl6749387986743898559646983194',
         'Content-Type': 'application/json'
-    }
+    }*/
 
     const data = {
       "query": {
@@ -144,7 +144,8 @@ export function SearchFlight() {
       const response = await fetch(url, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
+        //mode: 'no-cors'
       });
 
       if (response.ok) {
@@ -153,7 +154,6 @@ export function SearchFlight() {
 
         const jsonObject = vuelosFinal['content']['results']['itineraries'];
         const jsonArray: any = Object.values(jsonObject);
-        //const jsonArray = jsonObject.values;
         console.log(jsonObject)
 
         jsonArray.sort((a: any, b: any) => {
