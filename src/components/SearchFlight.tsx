@@ -54,7 +54,8 @@ export function SearchFlight() {
           break;
         } catch (error) {
           console.error(`Error fetching flight data. Retrying... (${i + 1}/10)`);
-          await delay(1500);
+          await delay(15000);
+         
         }
       }
 
@@ -78,9 +79,7 @@ export function SearchFlight() {
 
   async function buscarVuelo(cityDeparture: string, city1: string, city2: string, cityDays: string, departureDate: string, adults: string) {
     let flightData = [];
-    const url = "https://corsproxy.armsves.workers.dev/corsproxy/";
 
-    console.log(departureDate)
     const departure = departureDate.split("-");
     let date = new Date(parseInt(departure[0]), parseInt(departure[1]), parseInt(departure[2]));
     console.log(departure[0])
@@ -90,20 +89,28 @@ export function SearchFlight() {
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
-    console.log(date)
-    date.setDate(parseInt(day + cityDays));
+    console.log(date + " date1")
+    date.setDate(day + parseInt(cityDays));
     const day2 = date.getDate();
     const month2 = date.getMonth() + 1;
     const year2 = date.getFullYear();
-    console.log(date)
-    date.setDate(parseInt(day2 + cityDays));
+    console.log(date + " date2")
+    date.setDate(day2 + parseInt(cityDays));
     const day3 = date.getDate();
     const month3 = date.getMonth() + 1;
     const year3 = date.getFullYear();
-    console.log(day3)
+    console.log(date + " date3")
 
+    //const url = "https://corsproxy.armsves.workers.dev/corsproxy/";
+    //const headers = {};
+    const url = "https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create/";
+    //const headers = { " x-api-key" : "sh428739766321522266746152871799" };
+    //url = 'https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create'
+    const headers = {
+        'x-api-key': 'prtl6749387986743898559646983194',
+        'Content-Type': 'application/json'
+    }
 
-    const headers = {};
     const data = {
       "query": {
         "market": "US",
@@ -147,6 +154,7 @@ export function SearchFlight() {
         const jsonObject = vuelosFinal['content']['results']['itineraries'];
         const jsonArray: any = Object.values(jsonObject);
         //const jsonArray = jsonObject.values;
+        console.log(jsonObject)
 
         jsonArray.sort((a: any, b: any) => {
           console.log(a["pricingOptions"][0]["price"]["amount"] + " /n")
@@ -175,20 +183,6 @@ export function SearchFlight() {
   //***************** */
   const [responses, setResponses] = useState(null);
   const [responsesLink, setResponsesLink] = useState(null);
-
-  async function fetchData() {
-    try {
-      const response = await fetch("https://pokeapi.co/api/v2/ability/3");
-      if (response.ok) {
-        const data = await response.json();
-        setResponses(data);
-      } else {
-        console.error('API request failed with status code:', response.status);
-      }
-    } catch (error) {
-      console.error('An error occurred:', error);
-    }
-  }
 
   //**********
 
