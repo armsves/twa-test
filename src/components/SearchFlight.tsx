@@ -8,7 +8,12 @@ import { Slider } from '@mui/material';
 export function SearchFlight() {
   const { sender, connected } = useTonConnect();
 
+  //let placesSuggestion: any = [];
+  const [placesSuggestion, setPlacesSuggestion] = useState([]);
+  const [place0, setPlace0] = useState("");
+
   const [cityDeparture, setCityDeparture] = useState("");
+  const [cityDepartureVal, setCityDepartureVal] = useState("");
   const [city1, setCity1] = useState("");
   const [city2, setCity2] = useState("");
   const [cityDays, setcityDays] = useState("1");
@@ -17,6 +22,13 @@ export function SearchFlight() {
   const [sliderValue, setSliderValue] = useState(1);
 
   const [departureDate, setDepartureDate] = useState("");
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [suggestionsCity1, setSuggestionsCity1] = useState<Suggestion[]>([]);
+  const [suggestionClicked, setSuggestionClicked] = useState(false);
+  const [responses, setResponses] = useState(null);
+  const [responsesLink, setResponsesLink] = useState(null);
+
+
 
   const getCurrentDate = (): string => {
     const today = new Date();
@@ -25,6 +37,20 @@ export function SearchFlight() {
     const day = today.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
+
+  interface Suggestion {
+    entityId: string;
+    iataCode: string;
+    parentId: string;
+    name: string;
+    countryId: string;
+    countryName: string;
+    cityName: string;
+    location: string;
+    hierarchy: string;
+    type: string;
+    highlighting: number[][];
+  }
 
   const value = 0;
 
@@ -42,8 +68,6 @@ export function SearchFlight() {
 
   async function displayData(cityDeparture: string, city1: string, city2: string, cityDays: string, departureDate: string, adults: string) {
     try {
-      const loadingAnimation = document.getElementById('loadingAnimation');
-      //loadingAnimation.style.display = 'block';
       let bestFlight = [];
       let bestFlight2 = [];
 
@@ -55,23 +79,13 @@ export function SearchFlight() {
         } catch (error) {
           console.error(`Error fetching flight data. Retrying... (${i + 1}/10)`);
           await delay(15000);
-         
+
         }
       }
 
       if (bestFlight[0] > bestFlight2[0]) {
         bestFlight = bestFlight2;
       }
-
-      //const link = document.getElementById("link");
-      //const precio = document.getElementById("precio");
-      //const agents = document.getElementById("agents");
-      //precio.innerHTML = bestFlight[0] / 1000;
-      //agents.innerHTML = bestFlight[1];
-      //link.setAttribute("href", bestFlight[2]);
-      //loadingAnimation.style.display = 'none';
-      //const results = document.getElementById('results');
-      //results.style.display = 'block';
     } catch (error) {
       console.error(error);
     }
@@ -180,31 +194,101 @@ export function SearchFlight() {
     }
   }
 
-  //***************** */
-  const [responses, setResponses] = useState(null);
-  const [responsesLink, setResponsesLink] = useState(null);
+  function fetchSuggestions(inputField: string) {
+    if (inputField.length > 2) {
+      const url = 'https://corsautosuggest.armsves.workers.dev/corsproxy/';
+      //const searchTerm = inputField.value;
+      const data = {
+        query: {
+          market: 'UK',
+          locale: 'en-GB',
+          searchTerm: inputField,
+          includedEntityTypes: ['PLACE_TYPE_CITY', 'PLACE_TYPE_COUNTRY', 'PLACE_TYPE_AIRPORT']
+        },
+        limit: 5,
+        isDestination: true
+      };
 
-  //**********
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then((data: { places: Suggestion[] }) => {
+          setSuggestions(data.places); // Set the suggestions in state
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  }
 
-  //
-  //<Input style={{ marginRight: 8 }} type="number" value={tonAmount} onChange={(e) => setTonAmount(e.target.value)}></Input>
-  //<Input type="number" value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} >
-  //<Slider aria-label="Columns" value={sliderValue} onChange={handleSliderChange} min={1} max={6} step={1} />
-  //<Input type="number" min="1" value={cityDays} onChange={(e) => setcityDays(e.target.value)} ></Input>
-  //<Input value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} ></Input>
-  //  <Slider aria-label="Columns" value={sliderValue} onChange={handleSliderChange} min={1} max={6} step={1} />
+  function boldenMatch(text: string, highlighting: string) {
+    let boldenedText = text;
+
+    if (highlighting && highlighting.length > 0) {
+      const start = highlighting[0][0];
+      const end = highlighting[0][1];
+      //boldenedText = text.substring(0, start) + '<strong>' + text.substring(start, end) + '</strong>' + text.substring(end);
+    }
+    return boldenedText;
+  }
+
+  useEffect(() => {
+    if (cityDeparture.length >= 2 && !suggestionClicked) {
+      fetchSuggestions(cityDeparture);
+    } else {
+      setSuggestions([]);
+    }
+  }, [cityDeparture]);
+
+  useEffect(() => {
+    if (city1.length >= 2 && !suggestionClicked) {
+      fetchSuggestions(city1);
+    } else {
+      setSuggestions([]);
+    }
+  }, [city1]);
+
+  // Function to handle suggestion click
+  function handleSuggestionClick(place: Suggestion) {
+    // Update the input field with name and country name
+    const newValue = `${place.cityName}, ${place.countryName} (${place.iataCode})`;
+    setCityDeparture(newValue);
+    setCityDepartureVal(`${place.iataCode}`);
+    setSuggestionClicked(true);
+
+  }
+
+  //******* */
+
   return (
     <Card>
       <FlexBoxCol>
         <h3>Search Flight</h3>
         <FlexBoxRow>
           <label>Departure City: </label>
-          <Input style={{ width: '150px' }} value={cityDeparture} onChange={(e) => setCityDeparture(e.target.value)} ></Input>
+          <Input style={{ width: '150px' }} value={cityDeparture} onChange={(e) => { setCityDeparture(e.target.value); setSuggestionClicked(false); }} ></Input>
+          <div>
+            {suggestions.map((place: Suggestion, index) => (
+              <p key={index} onClick={() => handleSuggestionClick(place)} style={{ cursor: 'pointer' }}>
+                {`${place.cityName}, ${place.countryName} (${place.iataCode})`}
+              </p>
+            ))}
+          </div>
         </FlexBoxRow>
 
         <FlexBoxRow>
           <label>City 1: </label>
           <Input style={{ width: '150px' }} value={city1} onChange={(e) => setCity1(e.target.value)} ></Input>
+          <div>
+            {suggestionsCity1.map((place: Suggestion, index) => (
+              <p key={index} onClick={() => handleSuggestionClick(place)} style={{ cursor: 'pointer' }}>
+                {`${place.cityName}, ${place.countryName} (${place.iataCode})`}
+              </p>
+            ))}
+          </div>
         </FlexBoxRow>
 
         <FlexBoxRow>
@@ -218,7 +302,7 @@ export function SearchFlight() {
 
           <label>How many adults: </label>
           <Input style={{ width: '50px' }} type="number" min="1" value={adults} onChange={(e) => setAdults(e.target.value)} ></Input>
-          </FlexBoxRow>
+        </FlexBoxRow>
 
         <FlexBoxRow>
           <label>Date of departure: </label>
@@ -226,15 +310,39 @@ export function SearchFlight() {
 
         </FlexBoxRow>
 
-        <Button style={{ marginTop: 18 }}
-          onClick={async () => { buscarVuelo(cityDeparture, city1, city2, cityDays, departureDate, adults); }}
+        <Button style={{
+          marginTop: 18,
+          background: 'linear-gradient(45deg, #572785, #ec1e79, #28abe2, #f15a24, #fbb03b)',
+          color: 'white',
+          padding: '10px 20px',
+          border: 'none',
+          borderRadius: '45px',
+          fontWeight: 'bold',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          textDecoration: 'none',
+          textShadow: '0 0 2px black',
+        }}
+          onClick={async () => { buscarVuelo(cityDepartureVal, city1, city2, cityDays, departureDate, adults); }}
         >Search</Button>
       </FlexBoxCol>
       <FlexBoxCol>
         {responses ? (
           <div>
             <h3>The Best price is: €{JSON.stringify(responses, null, 2)}</h3>
-            <p><a href={responsesLink ? (responsesLink) : ("")} target="_blank">Buy Tickets</a></p>
+            <p><a style={{
+                  background: 'linear-gradient(45deg, #572785, #ec1e79, #28abe2, #f15a24, #fbb03b)',
+                  color: 'white',
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '45px',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                  textShadow: '0 0 2px black',
+            }}
+            href={responsesLink ? (responsesLink) : ("")} target="_blank">Buy Tickets</a></p>
           </div>
         ) : (
           <></>
