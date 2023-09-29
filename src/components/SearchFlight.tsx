@@ -4,9 +4,11 @@ import { Address, toNano } from "ton";
 import { useTonConnect } from "../hooks/useTonConnect";
 import { Card, FlexBoxCol, FlexBoxRow, Button, Input } from "./styled/styled";
 import { Slider } from '@mui/material';
+import { TonConnectButton } from "@tonconnect/ui-react";
+import { CHAIN } from "@tonconnect/protocol";
 
 export function SearchFlight() {
-  const { sender, connected } = useTonConnect();
+  const { network } = useTonConnect();
 
   //let placesSuggestion: any = [];
   const [placesSuggestion, setPlacesSuggestion] = useState([]);
@@ -74,8 +76,8 @@ export function SearchFlight() {
 
   async function displayData(cityDeparture: string, city1: string, city2: string, cityDays: string, departureDate: string, adults: string) {
     try {
-      let bestFlight = [];
-      let bestFlight2 = [];
+      let bestFlight: any = [];
+      let bestFlight2: any = [];
 
       for (let i = 0; i < 10; i++) {
         try {
@@ -98,105 +100,111 @@ export function SearchFlight() {
   }
 
   async function buscarVuelo(cityDeparture: string, city1: string, city2: string, cityDays: string, departureDate: string, adults: string) {
-    let flightData = [];
+    if (cityDeparture.trim() !== '' && city1.trim() !== '' && city2.trim() !== '' && cityDays.trim() !== '') {
+      // Execute your button function here
+      console.log(`Button clicked with cityDeparture value: ${cityDeparture} and city1 value: ${city1} and city2 value: ${city2}`);
+      let flightData = [];
 
-    const departure = departureDate.split("-");
-    let date = new Date(parseInt(departure[0]), parseInt(departure[1]), parseInt(departure[2]));
-    console.log(departure[0])
-    console.log(date)
+      const departure = departureDate.split("-");
+      let date = new Date(parseInt(departure[0]), parseInt(departure[1]), parseInt(departure[2]));
+      console.log(departure[0])
+      console.log(date)
 
-    //cityDays = parseInt(cityDays);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    console.log(date + " date1")
-    date.setDate(day + parseInt(cityDays));
-    const day2 = date.getDate();
-    const month2 = date.getMonth() + 1;
-    const year2 = date.getFullYear();
-    console.log(date + " date2")
-    date.setDate(day2 + parseInt(cityDays));
-    const day3 = date.getDate();
-    const month3 = date.getMonth() + 1;
-    const year3 = date.getFullYear();
-    console.log(date + " date3")
+      //cityDays = parseInt(cityDays);
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      console.log(date + " date1")
+      date.setDate(day + parseInt(cityDays));
+      const day2 = date.getDate();
+      const month2 = date.getMonth() + 1;
+      const year2 = date.getFullYear();
+      console.log(date + " date2")
+      date.setDate(day2 + parseInt(cityDays));
+      const day3 = date.getDate();
+      const month3 = date.getMonth() + 1;
+      const year3 = date.getFullYear();
+      console.log(date + " date3")
 
-    const url = "https://corsproxy2.armsves.workers.dev/corsproxy/";
-    const headers = {};
-    //const url = "https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create/";
-    //const headers = { " x-api-key" : "sh428739766321522266746152871799" };
-    //url = 'https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create'
-    /*const headers = {
-        'x-api-key': 'prtl6749387986743898559646983194',
-        'Content-Type': 'application/json'
-    }*/
+      const url = "https://corsproxy2.armsves.workers.dev/corsproxy/";
+      const headers = {};
+      //const url = "https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create/";
+      //const headers = { " x-api-key" : "sh428739766321522266746152871799" };
+      //url = 'https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create'
+      /*const headers = {
+          'x-api-key': 'prtl6749387986743898559646983194',
+          'Content-Type': 'application/json'
+      }*/
 
-    const data = {
-      "query": {
-        "market": "US",
-        "locale": "en-US",
-        "currency": "EUR",
-        "query_legs": [
-          {
-            "origin_place_id": { "iata": cityDeparture },
-            "destination_place_id": { "iata": city1 },
-            "date": { "year": year, "month": month, "day": day }
-          },
-          {
-            "origin_place_id": { "iata": city1 },
-            "destination_place_id": { "iata": city2 },
-            "date": { "year": year2, "month": month2, "day": day2 }
-          },
-          {
-            "origin_place_id": { "iata": city2 },
-            "destination_place_id": { "iata": cityDeparture },
-            "date": { "year": year3, "month": month3, "day": day3 }
-          }
-        ],
-        "adults": 1,
-        "cabin_class": "CABIN_CLASS_ECONOMY",
-        "nearbyAirports": false
-      }
-    };
-    console.log(data)
+      const data = {
+        "query": {
+          "market": "US",
+          "locale": "en-US",
+          "currency": "EUR",
+          "query_legs": [
+            {
+              "origin_place_id": { "iata": cityDeparture },
+              "destination_place_id": { "iata": city1 },
+              "date": { "year": year, "month": month, "day": day }
+            },
+            {
+              "origin_place_id": { "iata": city1 },
+              "destination_place_id": { "iata": city2 },
+              "date": { "year": year2, "month": month2, "day": day2 }
+            },
+            {
+              "origin_place_id": { "iata": city2 },
+              "destination_place_id": { "iata": cityDeparture },
+              "date": { "year": year3, "month": month3, "day": day3 }
+            }
+          ],
+          "adults": 1,
+          "cabin_class": "CABIN_CLASS_ECONOMY",
+          "nearbyAirports": false
+        }
+      };
+      console.log(data)
 
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(data),
-        //mode: 'no-cors'
-      });
-
-      if (response.ok) {
-        const vuelosFinal = await response.json();
-
-
-        const jsonObject = vuelosFinal['content']['results']['itineraries'];
-        const jsonArray: any = Object.values(jsonObject);
-        console.log(jsonObject)
-
-        jsonArray.sort((a: any, b: any) => {
-          console.log(a["pricingOptions"][0]["price"]["amount"] + " /n")
-          const amountA = parseInt(a["pricingOptions"][0]["price"]["amount"]);
-          const amountB = parseInt(b["pricingOptions"][0]["price"]["amount"]);
-          if (amountA < amountB) { return -1; } else if (amountA > amountB) { return 1; } else { return 0; }
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(data),
+          //mode: 'no-cors'
         });
-        const flightData = [jsonArray[0]["pricingOptions"][0]["price"]["amount"] / 1000, jsonArray[0]["pricingOptions"][0]["agentIds"][0], jsonArray[0]["pricingOptions"][0]["items"][0]["deepLink"]];
 
-        if (flightData != null) { jsonArray[0]["pricingOptions"][0]["price"]["amount"] / 1000; }
-        setResponses(flightData[0]);
-        setResponsesLink(flightData[2]);
-        console.log(flightData[0]);
-        console.log(flightData[2]);
-        return flightData;
-      } else {
-        console.log('Request failed with status code:', response.status);
-        throw new Error('API request failed');
+        if (response.ok) {
+          const vuelosFinal = await response.json();
+
+
+          const jsonObject = vuelosFinal['content']['results']['itineraries'];
+          const jsonArray: any = Object.values(jsonObject);
+          console.log(jsonObject)
+
+          jsonArray.sort((a: any, b: any) => {
+            console.log(a["pricingOptions"][0]["price"]["amount"] + " /n")
+            const amountA = parseInt(a["pricingOptions"][0]["price"]["amount"]);
+            const amountB = parseInt(b["pricingOptions"][0]["price"]["amount"]);
+            if (amountA < amountB) { return -1; } else if (amountA > amountB) { return 1; } else { return 0; }
+          });
+          const flightData = [jsonArray[0]["pricingOptions"][0]["price"]["amount"] / 1000, jsonArray[0]["pricingOptions"][0]["agentIds"][0], jsonArray[0]["pricingOptions"][0]["items"][0]["deepLink"]];
+
+          if (flightData != null) { jsonArray[0]["pricingOptions"][0]["price"]["amount"] / 1000; }
+          setResponses(flightData[0]);
+          setResponsesLink(flightData[2]);
+          console.log(flightData[0]);
+          console.log(flightData[2]);
+          return flightData;
+        } else {
+          console.log('Request failed with status code:', response.status);
+          throw new Error('API request failed');
+        }
+      } catch (error) {
+        console.error('An error occurred:', error);
+        throw error;
       }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      throw error;
+    } else {
+      alert('Please fill out all required fields.');
     }
   }
 
@@ -364,7 +372,16 @@ export function SearchFlight() {
   return (
     <Card>
       <FlexBoxCol>
-        <h3>Search Flight</h3>
+      <FlexBoxRow>
+        <TonConnectButton className="TonConnectButton"/>
+        <Button>
+          {network
+            ? network === CHAIN.MAINNET
+              ? "mainnet"
+              : "testnet"
+            : "N/A"}
+        </Button>
+      </FlexBoxRow>
         <FlexBoxRow>
           <label>Departure City: </label>
           <Input style={{ width: '150px' }} value={cityDeparture} onChange={(e) => { setCityDeparture(e.target.value); setSuggestionClicked(false); }} ></Input>

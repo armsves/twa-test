@@ -34,18 +34,9 @@ function App() {
     <StyledApp>
       <AppContainer>
         <FlexBoxCol>
-          <FlexBoxRow>
-            <TonConnectButton />
-            <Button>
-              {network
-                ? network === CHAIN.MAINNET
-                  ? "mainnet"
-                  : "testnet"
-                : "N/A"}
-            </Button>
-          </FlexBoxRow>
+
           <SearchFlight />
-          
+
         </FlexBoxCol>
       </AppContainer>
     </StyledApp>
