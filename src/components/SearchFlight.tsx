@@ -83,6 +83,8 @@ export function SearchFlight() {
         try {
           bestFlight = await buscarVuelo(cityDeparture, city1, city2, cityDays, departureDate, adults);
           bestFlight2 = await buscarVuelo(cityDeparture, city2, city1, cityDays, departureDate, adults);
+          console.log('ruta  1 ' && bestFlight);
+          console.log('ruta  2 ' && bestFlight2);
           break;
         } catch (error) {
           console.error(`Error fetching flight data. Retrying... (${i + 1}/10)`);
@@ -298,6 +300,7 @@ export function SearchFlight() {
     }
   }
 
+/*
   function boldenMatch(text: string, highlighting: string) {
     let boldenedText = text;
 
@@ -307,7 +310,7 @@ export function SearchFlight() {
       //boldenedText = text.substring(0, start) + '<strong>' + text.substring(start, end) + '</strong>' + text.substring(end);
     }
     return boldenedText;
-  }
+  }*/
 
   useEffect(() => {
     if (cityDeparture.length >= 2 && !suggestionClicked) {
