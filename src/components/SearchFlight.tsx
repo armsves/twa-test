@@ -178,7 +178,6 @@ export function SearchFlight() {
         if (response.ok) {
           const vuelosFinal = await response.json();
 
-
           const jsonObject = vuelosFinal['content']['results']['itineraries'];
           const jsonArray: any = Object.values(jsonObject);
           console.log(jsonObject)
@@ -371,7 +370,8 @@ export function SearchFlight() {
 
   //<Input style={{ width: '50px' }} type="number" min="1" value={cityDays} onChange={(e) => setcityDays(e.target.value)} ></Input>
   //<Input style={{ width: '50px' }} type="number" min="1" value={adults} onChange={(e) => setAdults(e.target.value)} ></Input>
-
+//linea 464
+//          onClick={async () => { buscarVuelo(cityDepartureVal, city1Val, city2Val, String(cityDays), departureDate, String(adults)); }}
   return (
     <Card>
       <FlexBoxCol>
@@ -462,7 +462,7 @@ export function SearchFlight() {
           textShadow: '0 0 2px black',
           width: '120px'
         }}
-          onClick={async () => { buscarVuelo(cityDepartureVal, city1Val, city2Val, String(cityDays), departureDate, String(adults)); }}
+          onClick={async () => { displayData(cityDepartureVal, city1Val, city2Val, String(cityDays), departureDate, String(adults)); }}
         >Search</Button>
       </FlexBoxCol>
       <FlexBoxCol>
